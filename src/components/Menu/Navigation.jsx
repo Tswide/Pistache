@@ -7,6 +7,7 @@ const Navigation = () => {
 
   return (
     <nav id='navigations__category'>
+      {/* boucle sur les category */}
       {category_name.map((name, index) => (
         <div className='groupe__plats_navigation' key={index}>
           <img className='img__plats_navigation' src={Plat} alt="Category Plats froid" />

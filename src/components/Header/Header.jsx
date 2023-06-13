@@ -10,6 +10,7 @@ function NavBar() {
     const [authUser, setAuthUser] = useState(null);
     const navigate = useNavigate();
 
+    //Verification de la connexion
     useEffect(() => {
         const listen = onAuthStateChanged(auth, user => {
           if (user) {
@@ -24,6 +25,7 @@ function NavBar() {
         }
     }, []);
 
+    //Deconnexion
     const userSignout = () => {
         signOut(auth).then(() => {
             console.log("sign out successful");
