@@ -1,0 +1,37 @@
+/* PRINCIPALE */
+#navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  z-index: 999;
+}
+
+
+/* PARTIE */
+#logo {
+  height: 70%;
+}
+
+#liens_navigation {
+  display: flex;
+  align-items: center;
+}
+
+
+/* NAVIGATIONS */
+.liens_nav {
+  display: flex;
+  margin-right: 2rem;
+}
+
+.liens_nav li {
+  padding: 0 10px;
+  font-size: 20px;
+}
+
+/* ICONS */
+.uil {
+  font-size: 30px;
+  padding: 0 2px;
+}

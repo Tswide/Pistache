@@ -1,0 +1,12 @@
+#informations {
+  height: 60%;
+  display: flex;
+  justify-content: space-between;
+}
+
+#photo__restaurent_information {
+  height: 300px;
+  width: 550px;
+  object-fit: cover;
+  box-shadow: 2px 2px 5px var(--stroke-color);
+}

@@ -1,0 +1,87 @@
+/* GENERAL MISE EN PLACE DE LA CARD FLIP */
+#card {
+  height: calc(100% - 6%);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.card__flip {
+  background-color: transparent;
+  height: 45%;
+  width: 28%;
+  perspective: 1000px;
+  margin-bottom: 20px;
+}
+
+.card__plat {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--pri-color);
+  border-radius: 10px 10px 10px 0;
+  box-shadow: 0 0 18px var(--stroke-color); 
+  transition: transform 1s;
+  transform-style: preserve-3d;
+}
+
+.card__flip:hover .card__plat {
+  transform: rotateY(180deg);
+  box-shadow: 0 0 18px var(--pri-color);
+}
+
+.card__front, .card__back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}
+
+.card__back {
+  width: 90%;
+  padding: 0 5%;
+  transform: rotateY(180deg);
+  background-color: var(--pri-color);
+  border-radius: 10px 10px 10px 0;
+}
+
+/* FRONT */
+
+.img__card {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px 10px 10px 150px;
+}
+
+/* BACK */
+/* titre */
+#groupe__decoration_titre {
+  position: relative;
+}
+
+#titre__plat_back {
+  font-size: 32px;
+  font-family: 'Playfair Display', sans-serif;
+}
+
+#deco__titre_back {
+  position: absolute;
+  top: 0;
+}
+
+/* description */
+#description__plat_back {
+  font-size: 20px;
+  letter-spacing: 2px;
+  line-height: 35px;
+}
+
+/* prix */
+#prix__plat_back {
+  text-align: right;
+  font-size: 100px;
+  font-weight: 700;
+  margin: 0;
+}

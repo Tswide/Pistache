@@ -1,0 +1,34 @@
+#navigations__category {
+  width: 620px;
+  display: flex;
+  justify-content: space-between;
+  margin: 3% 0;
+}
+
+.groupe__plats_navigation {
+  transition: 0.3s;
+}
+
+.img__plats_navigation {
+  border: 5px solid var(--stroke-color);
+  border-radius: 100%;
+  height: 100px;
+  transition: 0.3s;
+}
+
+.img__plats_navigation:hover {
+  border-color: var(--pri-color);
+}
+
+.category__plats_navigation {
+  padding: 0;
+  margin: 0;
+  font-size: 20px;
+  font-family: 'Playfair Display', sans-serif;
+  text-align: center;
+  color: var(--stroke-color);
+}
+
+.groupe__plats_navigation:hover .category__plats_navigation {
+  color: var(--pri-color);
+}

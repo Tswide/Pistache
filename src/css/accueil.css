@@ -1,0 +1,14 @@
+#accueil {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: calc(100vh - 100px);
+}
+
+#deco {
+  position: absolute;
+  width: 100vw;
+  left: 0;
+  bottom: -180px;
+  z-index: 1;
+}
