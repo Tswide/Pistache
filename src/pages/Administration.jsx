@@ -2,8 +2,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react'
 import { auth } from '../Firebase';
 
-import Create from '../components/Admin/Create';
-import Read from '../components/Admin/Read';
+import Crud from '../components/Admin/Crud';
 
 const Administration = () => {
   //verification a la connexion
@@ -32,10 +31,9 @@ const Administration = () => {
             <>
              <div id="dashboard">
               <section id='liste'>
-                <Read />
               </section>
               <section id='edition'>
-                <Create />
+                <Crud />
               </section>
              </div>
             </> 
