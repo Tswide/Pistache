@@ -26,3 +26,15 @@
   font-size: 20px;
   font-weight: 500;
 }
+
+@media only screen 
+   and (max-width : 1490px) {
+    #contenue {
+      margin-bottom: 0;
+      width: 50%;
+    }
+    
+    .title__acc {
+      font-size: 70px;
+    }
+}
