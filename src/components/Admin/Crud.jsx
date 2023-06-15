@@ -1,21 +1,20 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../Firebase';
-import { uid } from 'uid';
-import { set, ref, onValue, remove, update } from 'firebase/database';
+import { set, ref, remove, update } from 'firebase/database';
 
-const Crud = () => {
-  // input formulaire
+const Crud = ({ selectedMenu, setSelectedMenu, handleCancelEdit }) => {
   const [imageMenu, setImageMenu] = useState("");
   const [titreMenu, setTitreMenu] = useState("");
   const [contenueMenu, setContenueMenu] = useState("");
-  // liste des menus
-  const [menus, setMenus] = useState([]);
-  //changement du titre
-  const [isEdit, setIsEdit] = useState(false);
-  const [tempId, setTempId] = useState("");
-  const [editedMenu, setEditedMenu] = useState(null);
 
-  // evenement lors du changement d'etat sur les input
+  useEffect(() => {
+    if (selectedMenu) {
+      setImageMenu(selectedMenu.image);
+      setTitreMenu(selectedMenu.titre);
+      setContenueMenu(selectedMenu.contenue);
+    }
+  }, [selectedMenu]);
+
   const handleImageChange = (e) => {
     setImageMenu(e.target.value);
   }
@@ -28,106 +27,61 @@ const Crud = () => {
     setContenueMenu(e.target.value);
   }
 
-  // READ
-  useEffect(() => {
-    onValue(ref(db, 'menu'), (snapshot) => {
-      const data = snapshot.val();
-      if (data !== null) {
-        const menusArray = Object.values(data);
-        setMenus(menusArray);
-      }
-    });
-  }, []);
+  const handleCreate = () => {
+    const newMenuRef = ref(db, 'menu').push();
+    const newMenuKey = newMenuRef.key;
 
-  // CREATE
-  const writeMenuData = () => {
-    const uuid = uid();
-
-    set(ref(db, `menu/${uuid}`), {
-      id: uuid,
+    set(ref(db, `menu/${newMenuKey}`), {
+      id: newMenuKey,
       image: imageMenu,
       titre: titreMenu,
       contenue: contenueMenu,
     });
-    
+
     setImageMenu("");
-    setTitreMenu(""); 
+    setTitreMenu("");
     setContenueMenu("");
   }
 
-  //UPDATE
-  const handleUpdate = (menu) => {
-    setIsEdit(true);
-    setTempId(menu.id);
-    setEditedMenu(menu);
-    setTitreMenu(menu.titre);
-    setContenueMenu(menu.contenue);
-  }
-
-  const handleSubmitChange = () => {
-    update(ref(db, `menu/${tempId}`), {
-      id: tempId,
+  const handleUpdate = () => {
+    update(ref(db, `menu/${selectedMenu.id}`), {
+      image: imageMenu,
       titre: titreMenu,
       contenue: contenueMenu,
     });
 
-    setTitreMenu("");
-    setContenueMenu("");
-    setIsEdit(false);
-    setEditedMenu(null);
+    setSelectedMenu(null);
+    handleCancelEdit();
   }
 
-  //DELETE
-  const handleDelete = (menu) => {
-    remove(ref(db, `menu/${menu.id}`))
-    .then(() => {
-      // Mise à jour de l'état menus après la suppression
-      const updatedMenus = menus.filter((m) => m.id !== menu.id);
-      setMenus(updatedMenus);
-    })
-    .catch((error) => {
-      console.log("Une erreur s'est produite lors de la suppression du menu :", error);
-    });
+  const handleDelete = () => {
+    remove(ref(db, `menu/${selectedMenu.id}`));
+
+    setSelectedMenu(null);
+    handleCancelEdit();
+  }
+
+  const handleCancel = () => {
+    setSelectedMenu(null);
+    handleCancelEdit();
   }
 
   return (
-    <>
-      <input type="file" accept='image/png, image/jpeg' name="image" value={imageMenu} onChange={handleImageChange} />
+    <div>
+      <input type="file" accept="image/png, image/jpeg" name="image" value={imageMenu} onChange={handleImageChange} />
       <input type="text" name="titre" value={titreMenu} onChange={handleTitreMenu} />
       <input type="text" name="contenue" value={contenueMenu} onChange={handleContenueMenu} />
-      {
-        isEdit
-          ? (
-            <>
-              <button onClick={handleSubmitChange}>Changement</button>
-              <button onClick={() => setIsEdit(false)}>X</button>
-            </>
-          )
-          : (
-            <button onClick={writeMenuData}>Envoyer</button>
-          )
-      }
-      {menus.map((menu) => (
-        <div key={menu.id}>
-        {
-          editedMenu === menu 
-            ? (
-              <>
-                <h1>{titreMenu}</h1>
-                <p>{contenueMenu}</p>
-              </>
-            )
-            : (
-              <>
-                <h1>{menu.titre}</h1>
-                <p>{menu.contenue}</p>
-              </>
-          )} 
-          <button onClick={() => handleUpdate(menu)}>Mettre à jour</button>
-          <button onClick={() => handleDelete(menu)}>Supprimer</button>
-        </div>
-      ))}
-    </>
+
+      {selectedMenu ? (
+        <>
+          <button onClick={handleUpdate}>Modifier</button>
+          <button onClick={handleDelete}>Supprimer</button>
+          <button onClick={handleCancel}>Annuler</button>
+        </>
+      ) : (
+        <button onClick={handleCreate}>Créer</button>
+      )}
+    </div>
   );
 };
 
