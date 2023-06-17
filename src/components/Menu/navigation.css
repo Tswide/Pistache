@@ -32,3 +32,39 @@
 .groupe__plats_navigation:hover .category__plats_navigation {
   color: var(--pri-color);
 }
+
+@media only screen 
+   and (max-width : 1490px) {
+    #navigations__category {
+      width: 620px;
+      margin: 20px 0  3% 0;
+    }
+    
+    .groupe__plats_navigation {
+      transition: 0.3s;
+    }
+    
+    .img__plats_navigation {
+      border: 5px solid var(--stroke-color);
+      border-radius: 100%;
+      height: 90px;
+      transition: 0.3s;
+    }
+    
+    .img__plats_navigation:hover {
+      border-color: var(--pri-color);
+    }
+    
+    .category__plats_navigation {
+      padding: 0;
+      margin: 0;
+      font-size: 20px;
+      font-family: 'Playfair Display', sans-serif;
+      text-align: center;
+      color: var(--stroke-color);
+    }
+    
+    .groupe__plats_navigation:hover .category__plats_navigation {
+      color: var(--pri-color);
+    }
+}
