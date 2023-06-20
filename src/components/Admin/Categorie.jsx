@@ -3,87 +3,69 @@ import { db } from '../../Firebase';
 import { uid } from 'uid';
 import { set, ref, onValue, remove, update } from 'firebase/database';
 
-const Crud = () => {
+const Categorie = () => {
   // input formulaire
-  const [imageMenu, setImageMenu] = useState("");
-  const [titreMenu, setTitreMenu] = useState("");
-  const [contenueMenu, setContenueMenu] = useState("");
+  const [titreCategorie, setTitreCategorie] = useState("");
+
   // liste des menus
-  const [menus, setMenus] = useState([]);
+  const [categories, setCategories] = useState([]);
   //changement du titre
   const [isEdit, setIsEdit] = useState(false);
   const [tempId, setTempId] = useState("");
-  const [editedMenu, setEditedMenu] = useState(null);
+  const [editedCategorie, setEditedCategorie] = useState(null);
 
   // evenement lors du changement d'etat sur les input
-  const handleImageChange = (e) => {
-    setImageMenu(e.target.value);
-  }
-
-  const handleTitreMenu = (e) => {
-    setTitreMenu(e.target.value);
-  }
-
-  const handleContenueMenu = (e) => {
-    setContenueMenu(e.target.value);
+  const handleTitreChange = (e) => {
+    setTitreCategorie(e.target.value);
   }
 
   // READ
   useEffect(() => {
-    onValue(ref(db, 'menu'), (snapshot) => {
+    onValue(ref(db, 'categorie'), (snapshot) => {
       const data = snapshot.val();
       if (data !== null) {
-        const menusArray = Object.values(data);
-        setMenus(menusArray);
+        const categorieArray = Object.values(data);
+        setCategories(categorieArray);
       }
     });
   }, []);
 
   // CREATE
-  const writeMenuData = () => {
+  const writeCategorieData = () => {
     const uuid = uid();
 
-    set(ref(db, `menu/${uuid}`), {
+    set(ref(db, `categorie/${uuid}`), {
       id: uuid,
-      image: imageMenu,
-      titre: titreMenu,
-      contenue: contenueMenu,
+      titre: titreCategorie    
     });
     
-    setImageMenu("");
-    setTitreMenu(""); 
-    setContenueMenu("");
+    setTitreCategorie("")  
   }
 
   //UPDATE
-  const handleUpdate = (menu) => {
+  const handleUpdate = (categorie) => {
     setIsEdit(true);
-    setTempId(menu.id);
-    setEditedMenu(menu);
-    setTitreMenu(menu.titre);
-    setContenueMenu(menu.contenue);
+    setTempId(categorie.id);
+    setEditedCategorie(categorie);
+    setTitreCategorie(categorie.titre);
   }
 
   const handleSubmitChange = () => {
-    update(ref(db, `menu/${tempId}`), {
+    update(ref(db, `categorie/${tempId}`), {
       id: tempId,
-      titre: titreMenu,
-      contenue: contenueMenu,
+      titre: titreCategorie,
     });
 
-    setTitreMenu("");
-    setContenueMenu("");
-    setIsEdit(false);
-    setEditedMenu(null);
+    setTitreCategorie("");
   }
 
   //DELETE
-  const handleDelete = (menu) => {
-    remove(ref(db, `menu/${menu.id}`))
+  const handleDelete = (categorie) => {
+    remove(ref(db, `categorie/${categorie.id}`))
     .then(() => {
       // Mise à jour de l'état menus après la suppression
-      const updatedMenus = menus.filter((m) => m.id !== menu.id);
-      setMenus(updatedMenus);
+      const updatedCategories = categories.filter((c) => c.id !== categorie.id);
+      setCategories(updatedCategories);
     })
     .catch((error) => {
       console.log("Une erreur s'est produite lors de la suppression du menu :", error);
@@ -92,9 +74,7 @@ const Crud = () => {
 
   return (
     <>
-      <input type="file" accept='image/png, image/jpeg' name="image" value={imageMenu} onChange={handleImageChange} />
-      <input type="text" name="titre" value={titreMenu} onChange={handleTitreMenu} />
-      <input type="text" name="contenue" value={contenueMenu} onChange={handleContenueMenu} />
+      <input type="text" name="categorie" value={titreCategorie} onChange={handleTitreChange} />
       {
         isEdit
           ? (
@@ -104,31 +84,29 @@ const Crud = () => {
             </>
           )
           : (
-            <button onClick={writeMenuData}>Envoyer</button>
+            <button onClick={writeCategorieData}>Envoyer</button>
           )
       }
-      {menus.map((menu) => (
-        <div key={menu.id}>
+      {categories.map((categorie) => (
+        <div key={categorie.id}>
         {
-          editedMenu === menu 
+          editedCategorie === categorie 
             ? (
               <>
-                <h1>{titreMenu}</h1>
-                <p>{contenueMenu}</p>
+                <h1>{titreCategorie}</h1>
               </>
             )
             : (
               <>
-                <h1>{menu.titre}</h1>
-                <p>{menu.contenue}</p>
+                <h1>{categorie.titre}</h1>
               </>
           )} 
-          <button onClick={() => handleUpdate(menu)}>Mettre à jour</button>
-          <button onClick={() => handleDelete(menu)}>Supprimer</button>
+          <button onClick={() => handleUpdate(categorie)}>Mettre à jour</button>
+          <button onClick={() => handleDelete(categorie)}>Supprimer</button>
         </div>
       ))}
     </>
   );
 };
 
-export default Crud;
+export default Categorie;
