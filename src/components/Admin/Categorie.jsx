@@ -1,48 +1,53 @@
 import { useState, useEffect } from 'react';
-import { db } from '../../Firebase';
-import { uid } from 'uid';
-import { set, ref, onValue, remove, update } from 'firebase/database';
 
 const Categorie = () => {
-  // input formulaire
   const [titreCategorie, setTitreCategorie] = useState("");
-
-  // liste des menus
   const [categories, setCategories] = useState([]);
-  //changement du titre
   const [isEdit, setIsEdit] = useState(false);
   const [tempId, setTempId] = useState("");
   const [editedCategorie, setEditedCategorie] = useState(null);
 
-  // evenement lors du changement d'etat sur les input
   const handleTitreChange = (e) => {
     setTitreCategorie(e.target.value);
   }
 
-  // READ
   useEffect(() => {
-    onValue(ref(db, 'categorie'), (snapshot) => {
-      const data = snapshot.val();
-      if (data !== null) {
-        const categorieArray = Object.values(data);
-        setCategories(categorieArray);
-      }
-    });
+    // Effectuer une requête PHP pour récupérer les catégories depuis la base de données
+
+    // Exemple de code PHP pour récupérer les catégories depuis la base de données
+    fetch('api/getCategories.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data !== null) {
+          setCategories(data);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }, []);
 
-  // CREATE
   const writeCategorieData = () => {
-    const uuid = uid();
+    // Effectuer une requête PHP pour écrire les données de la catégorie dans la base de données
 
-    set(ref(db, `categorie/${uuid}`), {
-      id: uuid,
-      titre: titreCategorie    
-    });
-    
-    setTitreCategorie("")  
+    // Exemple de code PHP pour écrire les données de la catégorie dans la base de données
+    fetch('api/writeCategorie.php', {
+      method: 'POST',
+      body: JSON.stringify({
+        titre: titreCategorie
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Mettre à jour les catégories après l'écriture des données
+        setCategories([...categories, data]);
+        setTitreCategorie("");
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
-  //UPDATE
   const handleUpdate = (categorie) => {
     setIsEdit(true);
     setTempId(categorie.id);
@@ -51,25 +56,54 @@ const Categorie = () => {
   }
 
   const handleSubmitChange = () => {
-    update(ref(db, `categorie/${tempId}`), {
-      id: tempId,
-      titre: titreCategorie,
-    });
+    // Effectuer une requête PHP pour mettre à jour les données de la catégorie dans la base de données
 
-    setTitreCategorie("");
+    // Exemple de code PHP pour mettre à jour les données de la catégorie dans la base de données
+    fetch('api/updateCategorie.php', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: tempId,
+        titre: titreCategorie
+      })
+    })
+      .then(() => {
+        // Mettre à jour les catégories après la modification des données
+        const updatedCategories = categories.map((categorie) => {
+          if (categorie.id === tempId) {
+            return {
+              ...categorie,
+              titre: titreCategorie
+            };
+          }
+          return categorie;
+        });
+        setCategories(updatedCategories);
+        setTitreCategorie("");
+        setIsEdit(false);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
-  //DELETE
   const handleDelete = (categorie) => {
-    remove(ref(db, `categorie/${categorie.id}`))
-    .then(() => {
-      // Mise à jour de l'état menus après la suppression
-      const updatedCategories = categories.filter((c) => c.id !== categorie.id);
-      setCategories(updatedCategories);
+    // Effectuer une requête PHP pour supprimer la catégorie de la base de données
+
+    // Exemple de code PHP pour supprimer la catégorie de la base de données
+    fetch('api/deleteCategorie.php', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: categorie.id
+      })
     })
-    .catch((error) => {
-      console.log("Une erreur s'est produite lors de la suppression du menu :", error);
-    });
+      .then(() => {
+        // Mettre à jour les catégories après la suppression
+        const updatedCategories = categories.filter((c) => c.id !== categorie.id);
+        setCategories(updatedCategories);
+      })
+      .catch((error) => {
+        console.log("Une erreur s'est produite lors de la suppression de la catégorie :", error);
+      });
   }
 
   return (
@@ -90,7 +124,7 @@ const Categorie = () => {
       {categories.map((categorie) => (
         <div key={categorie.id}>
         {
-          editedCategorie === categorie 
+          editedCategorie === categorie
             ? (
               <>
                 <h1>{titreCategorie}</h1>
@@ -100,7 +134,7 @@ const Categorie = () => {
               <>
                 <h1>{categorie.titre}</h1>
               </>
-          )} 
+          )}
           <button onClick={() => handleUpdate(categorie)}>Mettre à jour</button>
           <button onClick={() => handleDelete(categorie)}>Supprimer</button>
         </div>
@@ -110,3 +144,4 @@ const Categorie = () => {
 };
 
 export default Categorie;
+
