@@ -1,7 +1,4 @@
-import { onAuthStateChanged } from 'firebase/auth';
-import { useEffect, useState } from 'react'
-import { auth } from '../Firebase';
-
+import { useEffect, useState } from 'react';
 import Navigation from '../components/Admin/Navigation';
 import Categorie from '../components/Admin/Categorie';
 import Liste from '../components/Admin/Liste';
@@ -14,33 +11,27 @@ const Administration = () => {
   const [selectedMenuId, setSelectedMenuId] = useState(null);
 
   useEffect(() => {
-    const listen = onAuthStateChanged(auth, user => {
-      if (user) {
-        setAuthUser(user)
-      } else {
-        setAuthUser(null)
-      }
-    });
-  
-    return() => {
-      listen();
-    }
+    // Code pour gérer l'authentification de l'utilisateur avec PHP
+
+    return () => {
+      // Nettoyage des écouteurs d'événements ou autres ressources
+    };
   }, []);
 
   const handleOpenCrudPopup = (menuId) => {
     setSelectedMenuId(menuId);
     setCrudPopupOpen(true);
-  }
+  };
 
   const handleCloseCrudPopup = () => {
     setCrudPopupOpen(false);
     setSelectedMenuId(null);
-  }
+  };
 
   const handleDeleteMenu = (menuId) => {
     // Gérer la suppression du menu ici en fonction de son ID
     console.log("Supprimer le menu avec l'ID :", menuId);
-  }
+  };
 
   return (
     <>
@@ -49,11 +40,11 @@ const Administration = () => {
           <>
             <Navigation active={active} setActive={setActive} />
 
-            <div id='categorie' style={{ display: active === 'categorie' ? 'block' : 'none' }}>
+            <div id="categorie" style={{ display: active === 'categorie' ? 'block' : 'none' }}>
               <Categorie />
             </div>
 
-            <div id='menu' style={{ display: active === 'menu' ? 'block' : 'none' }}>
+            <div id="menu" style={{ display: active === 'menu' ? 'block' : 'none' }}>
               <Liste onOpenCrudPopup={handleOpenCrudPopup} />
               {crudPopupOpen && (
                 <Crud
@@ -71,7 +62,8 @@ const Administration = () => {
         )}
       </section>
     </>
-  )
+  );
 };
 
 export default Administration;
+

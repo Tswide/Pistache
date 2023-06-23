@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db } from '../../Firebase';
-import { uid } from 'uid';
-import { set, ref, onValue, remove, update } from 'firebase/database';
-import { EditorState, convertToRaw, ContentState } from 'draft-js';
+import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
@@ -19,166 +16,90 @@ const Crud = ({ menuId, onCloseCrudPopup, onDeleteMenu }) => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   // State pour déterminer l'action en cours (Ajouter ou Modifier)
   const [action, setAction] = useState("Ajouter");
-  
-  //Nettoyage URL de l'objet lors du demontage du composant
-  useEffect(() => {
-    return () => {
-      URL.revokeObjectURL(imageMenu);
-    };
-  }, [imageMenu]);
 
-  // Gestionnaire de changement d'image
+  useEffect(() => {
+    // Code pour récupérer les données du menu à modifier en fonction de son ID avec PHP
+ 
+    // Mettre à jour les valeurs des champs et des états avec les données du menu récupérées
+    setTitreMenu("Titre du menu");
+    setEditorState(EditorState.createWithContent(convertToRaw(EditorState.createEmpty().getCurrentContent())));
+    setSelectedCategories([]);
+    setAction("Modifier");
+
+    // Code pour récupérer les catégories disponibles avec PHP
+
+    // Mettre à jour les catégories disponibles
+    setCategories(["Catégorie 1", "Catégorie 2", "Catégorie 3"]);
+  }, [menuId]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    const fileName = file.name;
-    setImageMenu(fileName);
+    // Gérer le changement d'image ici en fonction du fichier sélectionné
+    console.log("Changer l'image du menu :", file);
   };
 
-  // Gestionnaire de changement de titre du menu
-  const handleTitreMenu = (e) => {
-    setTitreMenu(e.target.value);
+  const handleTitreChange = (e) => {
+    const value = e.target.value;
+    setTitreMenu(value);
   };
 
-  // Gestionnaire de changement du contenu du menu (éditeur WYSIWYG)
-  const handleContenueMenu = (editorState) => {
+  const handleEditorChange = (editorState) => {
     setEditorState(editorState);
   };
 
-  // Gestionnaire de changement de catégories sélectionnées
   const handleCategoryChange = (e) => {
-    const selectedOptions = Array.from(e.target.options)
-      .filter(option => option.selected)
-      .map(option => option.value);
-    setSelectedCategories(selectedOptions);
+    const value = e.target.value;
+    // Gérer la sélection de catégorie ici en fonction de la valeur sélectionnée
+    console.log("Sélectionner la catégorie :", value);
   };
 
-  // Effet pour récupérer les catégories disponibles depuis la base de données
-  useEffect(() => {
-    onValue(ref(db, 'categorie'), (snapshot) => {
-      const data = snapshot.val();
-      if (data !== null) {
-        const categoriesArray = Object.values(data);
-        setCategories(categoriesArray);
-      }
-    });
-  }, []);
-
-  // Gestionnaire de soumission du formulaire (Ajouter un menu)
-  const handleSubmit = () => {
-    const uuid = uid();
-
-    // Récupérer le contenu de l'éditeur WYSIWYG
-    const rawContentState = convertToRaw(editorState.getCurrentContent());
-    const contenue = rawContentState.blocks[0].text;
-  
-    const data = {
-      id: uuid,
-      image: imageMenu || "",
-      titre: titreMenu || "",
-      contenue: contenue || "",
-      categories: selectedCategories || []
-    };
-
-    // Enregistrer les données du menu dans la base de données
-    set(ref(db, `menu/${uuid}`), data);
-
-    // Réinitialiser les valeurs des champs et des états après la soumission
-    setImageMenu("");
-    setTitreMenu("");
-    setEditorState(EditorState.createEmpty());
-    setSelectedCategories([]);
-  };
-
-  // Gestionnaire de mise à jour du menu
-  const handleUpdate = () => {
-    const rawContentState = convertToRaw(editorState.getCurrentContent());
-    const contenue = rawContentState.blocks[0].text;
-
-    // Mettre à jour les données du menu dans la base de données
-    update(ref(db, `menu/${menuId}`), {
-      image: imageMenu,
+  const handleSaveMenu = () => {
+    // Gérer l'enregistrement du menu ici avec les valeurs des champs et des états
+    console.log("Enregistrer le menu :", {
       titre: titreMenu,
-      contenue: contenue,
+      contenu: JSON.stringify(convertToRaw(editorState.getCurrentContent())),
       categories: selectedCategories
     });
-
-    // Réinitialiser les valeurs des champs et des états après la mise à jour
-    setImageMenu("");
-    setTitreMenu("");
-    setEditorState(EditorState.createEmpty());
-    setSelectedCategories([]);
-    setAction("Ajouter");
   };
 
-  // Gestionnaire de suppression du menu
-  const handleDelete = () => {
-    // Supprimer le menu de la base de données
-    remove(ref(db, `menu/${menuId}`))
-      .then(() => {
-        // Appeler la fonction onDeleteMenu pour informer le parent de la suppression
-        onDeleteMenu(menuId);
-        // Appeler la fonction onCloseCrudPopup pour fermer le pop-up Crud après la suppression
-        onCloseCrudPopup();
-      })
-      .catch((error) => {
-        console.log("Une erreur s'est produite lors de la suppression du menu :", error);
-      });
-  };
-
-  // Gestionnaire de changement d'action (Ajouter ou Modifier)
-  const handleActionChange = (selectedAction) => {
-    setAction(selectedAction);
-    if (selectedAction === "Ajouter") {
-      // Réinitialiser les valeurs des champs et des états lorsque l'action est "Ajouter"
-      setImageMenu("");
-      setTitreMenu("");
-      setEditorState(EditorState.createEmpty());
-      setSelectedCategories([]);
-    }
+  const handleDeleteMenu = () => {
+    // Gérer la suppression du menu ici en utilisant l'ID du menu
+    onDeleteMenu(menuId);
   };
 
   return (
-    <>
-      {/* Sélecteur d'action (Ajouter ou Modifier) */}
-      <select value={action} onChange={(e) => handleActionChange(e.target.value)}>
-        <option value="Ajouter">Ajouter</option>
-        <option value="Modifier">Modifier</option>
-      </select>
-
-      {/* Formulaire pour ajouter un menu */}
-      {action === "Ajouter" && (
-        <section>
-          <input type="file" accept="image/png, image/jpeg" name="image" value={imageMenu} onChange={handleImageChange} />
-          <input type="text" name="titre" value={titreMenu} onChange={handleTitreMenu} />
-          <Editor editorState={editorState} onEditorStateChange={handleContenueMenu} />
-          <select multiple value={selectedCategories} onChange={handleCategoryChange}>
+    <div className="crud-popup">
+      <div className="crud-popup-content">
+        <h2>{action === 'Ajouter' ? 'Ajouter un menu' : 'Modifier un menu'}</h2>
+        <div>
+          <label>Image du menu :</label>
+          <input type="file" onChange={handleImageChange} />
+        </div>
+        <div>
+          <label>Titre du menu :</label>
+          <input type="text" value={titreMenu} onChange={handleTitreChange} />
+        </div>
+        <div>
+          <label>Contenu du menu :</label>
+          <Editor editorState={editorState} onEditorStateChange={handleEditorChange} />
+        </div>
+        <div>
+          <label>Catégorie :</label>
+          <select value={selectedCategories} onChange={handleCategoryChange}>
             {categories.map((category) => (
-              <option key={category.id} value={category.id}>{category.titre}</option>
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
           </select>
-          <button onClick={handleSubmit}>Ajouter</button>
-        </section>
-      )}
-
-      {/* Formulaire pour modifier un menu */}
-      {action === "Modifier" && (
-        <section>
-          <input type="file" accept="image/png, image/jpeg" name="image" value={imageMenu} onChange={handleImageChange} />
-          <input type="text" name="titre" value={titreMenu} onChange={handleTitreMenu} />
-          <Editor editorState={editorState} onEditorStateChange={handleContenueMenu} />
-          <select multiple value={selectedCategories} onChange={handleCategoryChange}>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>{category.titre}</option>
-            ))}
-          </select>
-          <button onClick={handleUpdate}>Modifier</button>
-          <button onClick={handleDelete}>Supprimer</button>
-        </section>
-      )}
-
-      {/* Bouton pour fermer le pop-up Crud */}
-      <button onClick={onCloseCrudPopup}>Fermer</button>
-    </>
+        </div>
+        <div className="crud-popup-buttons">
+          <button onClick={handleSaveMenu}>{action === 'Ajouter' ? 'Ajouter' : 'Modifier'}</button>
+          {action === 'Modifier' && <button onClick={handleDeleteMenu}>Supprimer</button>}
+          <button onClick={onCloseCrudPopup}>Fermer</button>
+        </div>
+      </div>
+    </div>
   );
 };
 
