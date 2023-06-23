@@ -3,9 +3,9 @@
 // Connexion à la base de données
 // Assurez-vous de configurer les informations de connexion appropriées
 $host = 'localhost';
-$dbname = 'nom_de_votre_base_de_donnees';
-$username = 'nom_d_utilisateur';
-$password = 'mot_de_passe';
+$dbname = 'pistaches';
+$username = 'root';
+$password = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

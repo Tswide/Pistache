@@ -4,8 +4,6 @@ import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 const Crud = ({ menuId, onCloseCrudPopup, onDeleteMenu }) => {
-  // State pour gérer l'image du menu
-  const [imageMenu, setImageMenu] = useState("");
   // State pour gérer le titre du menu
   const [titreMenu, setTitreMenu] = useState("");
   // State pour gérer l'état de l'éditeur WYSIWYG
