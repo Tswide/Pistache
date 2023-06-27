@@ -122,7 +122,7 @@ const Categorie = () => {
           )
       }
       {categories.map((categorie) => (
-        <div key={categorie.id}>
+        <section key={categorie.id}>
         {
           editedCategorie === categorie
             ? (
@@ -137,7 +137,7 @@ const Categorie = () => {
           )}
           <button onClick={() => handleUpdate(categorie)}>Mettre à jour</button>
           <button onClick={() => handleDelete(categorie)}>Supprimer</button>
-        </div>
+        </section>
       ))}
     </>
   );
